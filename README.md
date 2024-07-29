@@ -1,6 +1,6 @@
-# Docker networking
+# Sniffing Docker network traffic
 
-How its handled.
+![setup](./traffic.png)
 
 ## Setup
 
