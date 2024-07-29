@@ -2,7 +2,7 @@
 
 How its handled.
 
-## Inspecting traffic
+## Setup
 
 To follow these instructions you need to run this on linux or windows WSL.
 
@@ -30,9 +30,9 @@ Which means that `35354` and `35550` share network namespace (simulates pod).
 2. As I said above it uses bridge network to communicate between "pods" and to communicate to host through gateway. Because of this we can inspect traffic between
    `pod_one_container` and `pod_two_container` (when we are directly on host machine) but not traffic between `pod_one_container` and `pod_one_side_car`.
 
-Howto:
+## Inspecting traffic:
 
-- Find bridge network that was created by docker compose.
+1. Find bridge network that was created by docker compose.
 
 ```bash
 ┌──(root㉿kali)-[/home/ales/personal/docker-networking]
@@ -151,7 +151,7 @@ Inspect `ip a` of `ifconfig` to find correct interface:
 
 We see that `br-b52ba1fca3c3` matches this subnet (we are looking for br-\* something).
 
-- Use tcpdump to inspect traffic:
+2. Use tcpdump to inspect traffic:
 
 ```bash
 ┌──(root㉿kali)-[/home/ales/personal/docker-networking]
@@ -187,9 +187,11 @@ listening on br-b52ba1fca3c3, link-type EN10MB (Ethernet), snapshot length 26214
 
 We see that there is only traffic between `pod_one_container` and `pod_two_container`.
 
-3. To inspect traffic between containers in pod we need to enter the same namespace of pod. To do this you need to be root.
+### Inspect traffic between containers inside pod
 
-- Find PID of one of the containers inside first pod.
+To inspect traffic between containers in pod we need to enter the same namespace of pod. To do this you need to be root.
+
+1. Find PID of one of the containers inside first pod.
 
 ```bash
 ┌──(root㉿kali)-[/home/ales/personal/docker-networking]
@@ -201,14 +203,14 @@ lrwxrwxrwx 1 root root 0 Jul 29 21:56 /proc/42777/ns/net -> 'net:[4026533088]'
 
 From output above we can assume that pids we want are `42777` and `42621` because of net ns sharing.
 
-- Enter the net namespace
+2.  Enter the net namespace
 
 `nsenter -t 42777 -a /bin/bash`
 
 - -t means which PID to target
 - -a means to join all namespaces (we could just target net ns)
 
-- Inpect traffic. Because we know that communication is happening through the localhost we are interested in loopback interface.
+3. Inpect traffic. Because we know that communication is happening through the localhost we are interested in loopback interface.
 
 ```bash
 ┌──(root㉿kali)-[/home/ales/personal/docker-networking]
