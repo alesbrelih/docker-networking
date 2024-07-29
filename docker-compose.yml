@@ -1,0 +1,25 @@
+services:
+  pod_one_container:
+    build: .
+    container_name: pod_one_container
+    environment:
+      - SERVICE_NAME=pod_one_container
+      - TARGET_URL=http://localhost:8888
+      - PORT=8080
+
+  pod_one_side_car:
+    build: .
+    container_name: pod_one_side_car
+    network_mode: container:pod_one_container
+    environment:
+      - SERVICE_NAME=pod_one_side_car
+      - TARGET_URL=http://localhost:8080
+      - PORT=8888
+
+  pod_two_container:
+    build: .
+    container_name: pod_two_container
+    environment:
+      - SERVICE_NAME=pod_two_container
+      - TARGET_URL=http://pod_one_container:8080
+      - PORT=8080
