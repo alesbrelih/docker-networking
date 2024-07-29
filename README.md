@@ -9,7 +9,7 @@ To follow these instructions you need to run this on linux or windows WSL.
 1. Run `docker compose up`
 
 - This will spawn 3 containers in a new docker network.
-- This network is a bridge network so its basically like a virtual switch.
+- This docker network is a bridge network so its basically like a virtual switch (plug and play using ARP)
 - Compose is structured in a way that it simulates pods. So two containers share network namespace while third has a separate network namespace.
   This can also be seen from URL configuration because containers inside first pod can communicate using localhost (same as sidecar - container does)
 
