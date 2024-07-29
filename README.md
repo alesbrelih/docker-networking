@@ -28,6 +28,7 @@ lrwxrwxrwx 1 root root 0 Jul 29 21:37 /proc/35550/ns/net -> 'net:[4026533304]'
 Which means that `35354` and `35550` share network namespace (simulates pod).
 
 **Network namespaces** (geekish bonus):
+
 If a process is a different network namespace it means that is has a completly new network stack (iptables, routes, ...). By default its not even reachable from host,
 nor it can communicate outside network namespace (host/world). Its like a brand new machine.
 What docker does is once contaienr is created (and so is network namespace), it creates a pair of virtual ethernet interfaces,
