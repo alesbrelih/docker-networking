@@ -1,4 +1,4 @@
-# Sniffing Docker network traffic
+# Sniffing Docker/Pod network traffic
 
 ![setup](./traffic.png)
 
@@ -296,3 +296,7 @@ listening on lo, link-type EN10MB (Ethernet), snapshot length 262144 bytes
         0x0020:  8010 0103 fe28 0000 0101 080a 5fdd 9580  .....(......_...
         0x0030:  5fdd 9580                                _...
 ```
+
+## Note
+
+These were handmade "pods", k8s is flexible with its network setup/implementation, so different CNI might result in different implementations.
