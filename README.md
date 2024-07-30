@@ -4,16 +4,16 @@
 
 ## Setup
 
-To follow these instructions you need to run this on linux or windows WSL.
+To follow these instructions you need to run them on either Linux or Windows WSL.
 
 1. Run `docker compose up`
 
-- This will spawn 3 containers in a new docker network.
-- This docker network is a bridge network so its basically like a virtual switch
-- Compose is structured in a way that it simulates pods. So two containers share network namespace while third has a separate network namespace.
-  This can also be seen from URL configuration because containers inside first pod can communicate using localhost (same as sidecar - container does)
+- This will spawn 3 containers in a new Docker network.
+- This Docker network is a bridge network so its basically like a virtual switch.
+- Compose is structured in a way that it simulates pods. So two containers share a network namespace while third has a separate network namespace.
+  Network namespace can also be seen from the URL configuration since containers inside the first pod communicate using localhost (same as the sidecar container does).
 
-To prove this setup we can use (last ls needs sudo):
+To prove this we can run (last `ls` needs `sudo`):
 
 `ps -eo pid,cmd | grep -w 'main' | grep -v grep | awk '{print $1}' | xargs -I{} ls -l /proc/{}/ns/net`
 
@@ -25,16 +25,16 @@ lrwxrwxrwx 1 root root 0 Jul 29 21:36 /proc/35354/ns/net -> 'net:[4026533304]'
 lrwxrwxrwx 1 root root 0 Jul 29 21:37 /proc/35550/ns/net -> 'net:[4026533304]'
 ```
 
-Which means that `35354` and `35550` share network namespace (simulates pod).
+Which means that processes `35354` and `35550` share a network namespace (simulates pod).
 
 **Network namespaces** (geekish bonus):
 
-If a process is a different network namespace it means that is has a completly new network stack (iptables, routes, ...). By default its not even reachable from host,
-nor it can communicate outside network namespace (host/world). Its like a brand new machine.
-What docker does is once contaienr is created (and so is network namespace), it creates a pair of virtual ethernet interfaces,
-plugs one into docker bridge and other to newly created network namespace. Then it sets up ip routes for default traffic inside container through bridge and sets up IP masquerading using IP tables (when we use port publishing it also uses iptables to do the magic). Container to container communication works out of the box through bridge because of Address Resolution Protocol.
+If a process is a different network namespace it means that is has a completely new network stack (iptables, routes, ...). By default its not even reachable from the host,
+nor can it communicate outside the network namespace (host/world). Its like a brand new machine.
+What docker does is once a container is created (and so is it's network namespace), it creates a pair of virtual ethernet interfaces,
+plugs one into docker bridge and other one into a newly created network namespace. Then it sets up ip routes for the default traffic inside the container through docker bridge and sets up IP masquerading using iptables (when we use port publishing it also uses iptables to do the magic). Container to container communication works out of the box through docker bridge because of Address Resolution Protocol.
 
-2. As I said above it uses bridge network to communicate between "pods" and to communicate to host through gateway. Because of this we can inspect traffic between
+2. As we said above it uses docker bridge to communicate between "pods" and also to communicate to host through a gateway. Because of this we can inspect traffic between
    `pod_one_container` and `pod_two_container` (when we are directly on host machine) but not traffic between `pod_one_container` and `pod_one_side_car`.
 
 ## Inspecting traffic:
