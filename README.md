@@ -39,7 +39,7 @@ plugs one into docker bridge and other to newly created network namespace. Then 
 
 ## Inspecting traffic:
 
-1. Find bridge network that was created by docker compose.
+1. Find the bridge network that was created by docker compose.
 
 ```bash
 ┌──(root㉿kali)-[/home/ales/personal/docker-networking]
@@ -51,7 +51,7 @@ dad376595944   host                        host      local
 5ba270775b0e   none                        null      local
 ```
 
-In this case I'm interested in `docker-networking_default`.
+In this case we are interested in `docker-networking_default`.
 
 Then inspect it to finds its subnet:
 
@@ -109,13 +109,13 @@ Then inspect it to finds its subnet:
 ]
 ```
 
-We see that subnet is:
+We can see that its subnet is:
 
 ```
     "Subnet": "172.23.0.0/16",
 ```
 
-Inspect `ip a` of `ifconfig` to find correct interface:
+Now use `ip a` or `ifconfig` to find the network interface which has the same subnet:
 
 ```bash
 ┌──(root㉿kali)-[/home/ales/personal/docker-networking]
@@ -156,9 +156,9 @@ Inspect `ip a` of `ifconfig` to find correct interface:
        valid_lft forever preferred_lft forever
 ```
 
-We see that `br-b52ba1fca3c3` matches this subnet (we are looking for br-\* something).
+We can see that `br-b52ba1fca3c3` matches this the previously inspected subnet (we are looking for br-\* something).
 
-2. Use tcpdump to inspect traffic:
+2. Use `tcpdump` to inspect traffic:
 
 ```bash
 ┌──(root㉿kali)-[/home/ales/personal/docker-networking]
@@ -192,13 +192,13 @@ listening on br-b52ba1fca3c3, link-type EN10MB (Ethernet), snapshot length 26214
         0x00c0:  6169 6e65 7221                           ainer!
 ```
 
-We see that there is only traffic between `pod_one_container` and `pod_two_container`.
+We can see that there is only traffic between `pod_one_container` and `pod_two_container`.
 
 ### Inspect traffic between containers inside pod
 
-To inspect traffic between containers in pod we need to enter the same namespace of pod. To do this you need to be root.
+To inspect traffic between pod's containers we need to enter the pod's namespace (which requires root privileges).
 
-1. Find PID of one of the containers inside first pod.
+1. Find the PID of one of the containers inside the first pod.
 
 ```bash
 ┌──(root㉿kali)-[/home/ales/personal/docker-networking]
@@ -208,16 +208,16 @@ lrwxrwxrwx 1 root root 0 Jul 29 21:48 /proc/42628/ns/net -> 'net:[4026533304]'
 lrwxrwxrwx 1 root root 0 Jul 29 21:56 /proc/42777/ns/net -> 'net:[4026533088]'
 ```
 
-From output above we can assume that pids we want are `42777` and `42621` because of net ns sharing.
+From the above output we can assume that we should further investigate PIDs `42777` and `42621` since they share the same net namespace ID.
 
-2.  Enter the net namespace
+2. Enter the net namespace of PID 42777
 
 `nsenter -t 42777 -a /bin/bash`
 
 - -t means which PID to target
 - -a means to join all namespaces (we could just target net ns)
 
-3. Inpect traffic. Because we know that communication is happening through the localhost we are interested in loopback interface.
+3. Inpect traffic. Since we know that communication is happening through localhost we are interested in the loopback interface.
 
 ```bash
 ┌──(root㉿kali)-[/home/ales/personal/docker-networking]
